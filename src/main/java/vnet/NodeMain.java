@@ -35,7 +35,7 @@ public class NodeMain {
                     ReceivedDatagram received = network.receive();
 
                     String message = new String(
-                            received.data(),
+                            received.datagram(),
                             StandardCharsets.UTF_8
                     );
 

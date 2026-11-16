@@ -48,7 +48,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
     }
 
     @Override
-    public void send(NodeId destination, byte[] data)
+    public void send(NodeId destination, byte[] datagram)
             throws IOException {
 
         InetSocketAddress endpoint = peers.get(destination);
@@ -59,15 +59,15 @@ public class DirectUdpNetwork implements DatagramNetwork {
             );
         }
 
-        if (data.length > maxPayloadSize()) {
+        if (datagram.length > maxDatagramSize()) {
             throw new IllegalArgumentException(
                     "Datagram exceeds maximum payload size"
             );
         }
 
         DatagramPacket packet = new DatagramPacket(
-                data,
-                data.length,
+                datagram,
+                datagram.length,
                 endpoint
         );
 
@@ -75,7 +75,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
     }
 
     @Override
-    public int maxPayloadSize() {
+    public int maxDatagramSize() {
         return 1200;
     }
 
@@ -88,7 +88,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
     public ReceivedDatagram receive() throws IOException {
 
         while (true) {
-            byte[] buffer = new byte[maxPayloadSize() + 1];
+            byte[] buffer = new byte[maxDatagramSize() + 1];
 
             DatagramPacket packet = new DatagramPacket(
                     buffer,
@@ -97,7 +97,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
 
             socket.receive(packet);
 
-            if (packet.getLength() > maxPayloadSize()) {
+            if (packet.getLength() > maxDatagramSize()) {
                 continue;
             }
 
@@ -165,7 +165,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
 
                 socket.setSoTimeout(socketTimeout);
 
-                byte[] buffer = new byte[maxPayloadSize() + 1];
+                byte[] buffer = new byte[maxDatagramSize() + 1];
 
                 DatagramPacket packet =
                         new DatagramPacket(buffer, buffer.length);
@@ -185,7 +185,7 @@ public class DirectUdpNetwork implements DatagramNetwork {
                     );
                 }
 
-                if (packet.getLength() > maxPayloadSize()) {
+                if (packet.getLength() > maxDatagramSize()) {
                     continue;
                 }
 
