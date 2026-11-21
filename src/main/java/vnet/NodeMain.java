@@ -1,11 +1,15 @@
 package vnet;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Map;
 
 public class NodeMain {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public static void main(String[] args) throws Exception {
 
@@ -31,18 +35,8 @@ public class NodeMain {
                              new DirectUdpNetwork(socket, peers)) {
 
                     System.out.println("Node B listening on port 9002");
-
-                    ReceivedDatagram received = network.receive();
-
-                    String message = new String(
-                            received.datagram(),
-                            StandardCharsets.UTF_8
-                    );
-
-                    System.out.println(
-                            "Received from " + received.source()
-                                    + ": " + message
-                    );
+                    ProbeService service = new ProbeService(network);
+                    service.runListener();
                 }
             }
 
@@ -52,16 +46,13 @@ public class NodeMain {
                 try (DirectUdpNetwork network =
                              new DirectUdpNetwork(socket, peers)) {
 
-                    byte[] data = "Hello from Node A!"
-                            .getBytes(StandardCharsets.UTF_8);
-
-                    network.send(nodeB, data);
-
-                    System.out.println("Message sent to Node B");
+                    ProbeService service = new ProbeService(network);
+                    service.runProbe(nodeB);
                 }
             }
 
             default -> System.out.println("Unknown mode");
         }
     }
+
 }
